@@ -8,6 +8,7 @@ Nivaran is a service-providing website designed to offer a range of home service
 ## Authors
 
 - [@Devendra](https://www.github.com/Devendraxp)
+- [@Ananya Singh](https://www.github.com/AnanyaSingh44)
 
 
 ## Getting Started

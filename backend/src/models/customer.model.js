@@ -40,6 +40,8 @@ const customerSchema = new Schema({
     refreshToken:{
         type:String,
     },
+},{
+    timeStamps:true,
 });
 
 

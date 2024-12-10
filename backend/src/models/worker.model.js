@@ -2,7 +2,6 @@ const mongoose=require("mongoose");
 const Schema=mongoose.Schema;
 const Rating=require("./rating.model.js");
 const Customer=require("./customer.model.js");
-const Experience=require("./experience.model.js")
 
 
 const imageSchema = new Schema({
@@ -36,12 +35,12 @@ const workerSchema=new Schema({
     lowercase:true,
     trim: true,
 },
-phone_no:{
+phoneNo:{
     type:Number,
     required:true,
 },
 address:{
-    flat_No:{
+    flatNo:{
         type:[String],
         required:true,
     },
@@ -63,9 +62,12 @@ address:{
     },
 
 },
-worker_pimg:[imageSchema],
-working_hours:{
-    type:Number,
+profileImg:
+{
+    type:imageSchema,
+},
+workingHours:{
+    type:[Number],
     required:true,
 },
 description:{
@@ -87,9 +89,10 @@ rating:[
     }
 ],
 experience:{
-    type:Schema.Types.ObjectId,
-    ref: "Experience",
+ type:Number,
+ required:true,
 },
+gallery:[imageSchema],
 password:{
     type:String,
     required:true,
@@ -97,19 +100,19 @@ password:{
 refreshToken:{
     type:String,
 }
-
-
 })
 
 workerSchema.pre("save", function (next) {
     // Apply the default URL if imgUrl is empty
-    this.worker_pimg.forEach((img) => {
+    this.profileImg.forEach((img) => {
       if (!img.imgUrl) {
         img.imgUrl =
 "https://img.freepik.com/premium-vector/illustration-modern-construction-working-man-laptop-use-cartoon-vector-white-background_734841-247.jpg?semt=ais_hybrid"      }
     });
     next();
-  });
+  },{
+    timeStamps:true,
+});
 
 const worker=mongoose.model("worker",workerSchema);
 module.exports=worker;

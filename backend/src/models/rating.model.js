@@ -10,16 +10,14 @@ const ratingSchema=new Schema({
         min: 1,
         max: 5,},
     comment: String,
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
     owner: {
         type: Schema.Types.ObjectId,
         ref: "Customer",
         // required: true,
     },
 
+},{
+    timeStamps:true,
 })
 
 module.exports = mongoose.model("Rating", ratingSchema);

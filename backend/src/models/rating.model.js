@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
-const Customer=require("./customer.model.js");
+import { Customer } from "./customer.model.js";
 
 
 const ratingSchema=new Schema({
@@ -20,4 +20,4 @@ const ratingSchema=new Schema({
     timeStamps:true,
 })
 
-module.exports = mongoose.model("Rating", ratingSchema);
+export const Rating = mongoose.model("Rating", ratingSchema);

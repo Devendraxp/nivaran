@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const imageSchema = new Schema({
@@ -56,4 +56,4 @@ customerSchema.pre("save", function (next) {
     next();
   });
 
-module.exports = mongoose.model("Customer", customerSchema);
+export const Customer = mongoose.model("Customer", customerSchema);

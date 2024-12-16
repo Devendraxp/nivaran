@@ -19,6 +19,7 @@ const generateAccessAndRefreshToken = async (userId) => {
   }
 };
 
+//register route
 const registerWorker = asyncHandler(async (req, res) => {
   const {
     name,
@@ -89,7 +90,7 @@ const registerWorker = asyncHandler(async (req, res) => {
       new ApiResponse(200, createdWorker, "Worker registered successfully !!"),
     );
 });
-
+//login route
 const loginWorker = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
 
@@ -131,5 +132,74 @@ const loginWorker = asyncHandler(async (req, res) => {
       new ApiResponse(200, { worker: workerData }, "Worker login successfully"),
     );
 });
+//logout route
+const logoutWorker = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.cookies;
 
-export { registerWorker, loginWorker };
+  if (!refreshToken) {
+    throw new ApiError(400, "Unauthorized access");
+  }
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+  return res
+    .status(200)
+    .cookie("refreshToken", "", options)
+    .cookie("accessToken", "", options)
+    .json(new ApiResponse(200, "", "Logout successfully !!"));
+});
+
+//profile route
+
+const getWorkerProfile = asyncHandler(async (req, res) => {
+  const worker = await Worker.findById(req.worker._id).select(
+    "-password -refreshToken",
+  );
+
+  if (!worker) {
+    throw new ApiError(404, "Worker not found");
+  }
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, worker, "Worker profile fetched successfully"));
+});
+
+// upload gallery route
+// !! under constraction !!!
+const uploadGallery = asyncHandler(async (req, res) => {
+  const { worker } = req;
+  const { gallery } = req.files;
+
+  if (!gallery) {
+    throw new ApiError(400, "Gallery is required");
+  }
+
+  console.log("gallery :", gallery);
+
+  // const galleryUrls = await Promise.all(
+  //   gallery.map(async (image) => {
+  //     const url = await uploadOnCloudinary(image.path);
+  //     return url;
+  //   }),
+  // );
+
+  // worker.gallery.push(...galleryUrls.map((url) => url.url));
+  // await worker.save();
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, "worker", "Gallery images uploaded successfully !!"),
+    );
+});
+
+//exporting the functions
+export {
+  registerWorker,
+  loginWorker,
+  logoutWorker,
+  getWorkerProfile,
+  uploadGallery,
+};

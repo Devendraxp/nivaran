@@ -1,9 +1,9 @@
-import { asyncHandler } from "../utils/asyncHandler.js";
-import { Worker } from "../models/worker.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { Worker } from "../models/worker.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const generateAccessAndRefreshToken = async (userId) => {
@@ -13,16 +13,29 @@ const generateAccessAndRefreshToken = async (userId) => {
     const refreshToken = worker.generateRefreshToken();
     worker.refreshToken = refreshToken;
     await worker.save({ validateBeforeSave: false });
+    return { accessToken, refreshToken };
   } catch (error) {
     throw new ApiError(500, error || "Something went wrong !");
   }
 };
 
 const registerWorker = asyncHandler(async (req, res) => {
-  const { name, username, email, password } = req.body;
+  const {
+    name,
+    username,
+    email,
+    password,
+    phoneNo,
+    address,
+    description,
+    workingHours,
+    language,
+    services,
+    experience,
+  } = req.body;
 
   if ([name, username, email, password].some((field) => field?.trim() === "")) {
-    throw new ApiError(400, "All fields are required");
+    throw new ApiError(400, "All * fields are required");
   }
 
   const existedWorker = await Worker.findOne({
@@ -47,27 +60,76 @@ const registerWorker = asyncHandler(async (req, res) => {
   const worker = await Worker.create({
     name,
     email,
-    profileImg: profileImg,
+    profileImg: profileImg.url,
     password,
     username: username.toLowerCase(),
+    phoneNo,
+    address,
+    description,
+    workingHours,
+    language,
+    services,
+    experience,
   });
 
   const createdWorker = await Worker.findById(worker._id).select(
-    "-password -refreshToken"
+    "-password -refreshToken",
   );
 
   if (!createdWorker) {
     throw new ApiError(
       500,
-      "Something went wrong while registering the worker"
+      "Something went wrong while registering the worker",
     );
   }
 
   res
     .status(201)
     .json(
-      new ApiResponse(200, createdWorker, "Worker registered successfully !!")
+      new ApiResponse(200, createdWorker, "Worker registered successfully !!"),
     );
 });
 
-export { registerWorker };
+const loginWorker = asyncHandler(async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    throw new ApiError(400, "Username or email and password are required");
+  }
+
+  const worker = await Worker.findOne({
+    $or: [{ email: username }, { username }],
+  });
+
+  if (!worker) {
+    throw new ApiError(404, "User not found");
+  }
+
+  const isLogin = worker.isPasswordCorrect(password);
+  if (!isLogin) {
+    throw new ApiError(401, "Invalid credentials");
+  }
+
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+    worker._id,
+  );
+
+  const workerData = await Worker.findById(worker._id).select(
+    "-password -refreshToken",
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, options)
+    .json(
+      new ApiResponse(200, { worker: workerData }, "Worker login successfully"),
+    );
+});
+
+export { registerWorker, loginWorker };

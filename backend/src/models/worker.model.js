@@ -1,18 +1,18 @@
 import mongoose from "mongoose";
 import { Schema } from "mongoose";
-import {Rating} from "./rating.model.js";
-import {Customer} from "./customer.model.js";
+import { Rating } from "./rating.model.js";
+import { Customer } from "./customer.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-const imageSchema = new Schema({
-  filename: String,
-  imgUrl: {
-    type: String,
-    default:
-      "https://img.freepik.com/premium-vector/illustration-modern-construction-working-man-laptop-use-cartoon-vector-white-background_734841-247.jpg?semt=ais_hybrid",
-  },
-});
+// const imageSchema = new Schema({
+//   filename: String,
+//   imgUrl: {
+//     type: String,
+//     default:
+//       "https://img.freepik.com/premium-vector/illustration-modern-construction-working-man-laptop-use-cartoon-vector-white-background_734841-247.jpg?semt=ais_hybrid",
+//   },
+// });
 
 const workerSchema = new Schema(
   {
@@ -63,10 +63,12 @@ const workerSchema = new Schema(
       },
     },
     profileImg: {
-      type: imageSchema,
+      type: String,
+      default:
+        "https://img.freepik.com/premium-vector/illustration-modern-construction-working-man-laptop-use-cartoon-vector-white-background_734841-247.jpg?semt=ais_hybrid",
     },
     workingHours: {
-      type: [Number],
+      type: [Date],
       //   required: true,
     },
     description: {
@@ -91,7 +93,7 @@ const workerSchema = new Schema(
       type: Number,
       //   required: true,
     },
-    gallery: [imageSchema],
+    gallery: [String],
     password: {
       type: String,
       //   required: true,
@@ -102,7 +104,7 @@ const workerSchema = new Schema(
   },
   {
     timeStamps: true,
-  }
+  },
 );
 
 // workerSchema.pre("save", function (next) {
@@ -143,7 +145,7 @@ workerSchema.methods.generateAccessToken = function () {
     process.env.ACCESS_TOKEN_SECRET,
     {
       expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-    }
+    },
   );
 };
 workerSchema.methods.generateRefreshToken = function () {
@@ -156,9 +158,8 @@ workerSchema.methods.generateRefreshToken = function () {
     process.env.REFRESH_TOKEN_SECRET,
     {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
-    }
+    },
   );
 };
 
 export const Worker = mongoose.model("Worker", workerSchema);
-

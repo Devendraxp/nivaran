@@ -42,7 +42,7 @@ const workerSchema = new Schema(
     },
     address: {
       flatNo: {
-        type: [String],
+        type: String,
         // required: true,
       },
       town: {

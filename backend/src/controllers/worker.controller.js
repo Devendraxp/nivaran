@@ -175,23 +175,36 @@ const uploadGallery = asyncHandler(async (req, res) => {
   if (!gallery) {
     throw new ApiError(400, "Gallery is required");
   }
+  const galleryImages = await Promise.all(
+    gallery.map(async (file) => {
+      const img = await uploadOnCloudinary(file.path);
+      return img;
+    }),
+  );
 
-  console.log("gallery :", gallery);
-
-  // const galleryUrls = await Promise.all(
-  //   gallery.map(async (image) => {
-  //     const url = await uploadOnCloudinary(image.path);
-  //     return url;
-  //   }),
-  // );
-
-  // worker.gallery.push(...galleryUrls.map((url) => url.url));
-  // await worker.save();
+  galleryImages.map((img) => {
+    worker.gallery.push(img.url);
+  });
+  await worker.save({ validateBeforeSave: false });
+  console.log("worker :", worker);
 
   res
     .status(200)
     .json(
-      new ApiResponse(200, "worker", "Gallery images uploaded successfully !!"),
+      new ApiResponse(200, worker, "Gallery images uploaded successfully !!"),
+    );
+});
+
+const gallery = asyncHandler(async (req, res) => {
+  const { worker } = req;
+  res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        worker.gallery,
+        "Gallery images send successfully !!",
+      ),
     );
 });
 

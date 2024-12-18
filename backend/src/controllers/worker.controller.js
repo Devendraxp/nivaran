@@ -84,8 +84,18 @@ const registerWorker = asyncHandler(async (req, res) => {
     );
   }
 
-  res
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+    worker._id,
+  );
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
     .status(201)
+    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, options)
     .json(
       new ApiResponse(200, createdWorker, "Worker registered successfully !!"),
     );
@@ -152,7 +162,7 @@ const logoutWorker = asyncHandler(async (req, res) => {
 
 //profile route
 
-const getWorkerProfile = asyncHandler(async (req, res) => {
+const getCurrentWorker = asyncHandler(async (req, res) => {
   const worker = await Worker.findById(req.worker._id).select(
     "-password -refreshToken",
   );
@@ -167,7 +177,7 @@ const getWorkerProfile = asyncHandler(async (req, res) => {
 });
 
 // upload gallery route
-// !! under constraction !!!
+//  under construction !!!
 const uploadGallery = asyncHandler(async (req, res) => {
   const { worker } = req;
   const { gallery } = req.files;
@@ -195,16 +205,83 @@ const uploadGallery = asyncHandler(async (req, res) => {
     );
 });
 
-const gallery = asyncHandler(async (req, res) => {
-  const { worker } = req;
+const refreshAccessToken = asyncHandler(async (req, res) => {
+  const { refreshToken } = req.cookies;
+
+  if (!refreshToken) {
+    throw new ApiError(400, "Unauthorized access");
+  }
+
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, worker) => {
+    if (err) {
+      throw new ApiError(403, "Invalid refresh token");
+    }
+
+    const { accessToken } = await generateAccessAndRefreshToken(worker._id);
+
+    return res.status(200).cookie("accessToken", accessToken).json(new ApiResponse(200,"", "Token refreshed successfully"));
+  });
+})
+
+const updateWorkerProfileImg = asyncHandler(async (req, res) => {
+  
+  const worker = Worker.findById(req.worker._id).select("-password -refreshToken");
+
+  const profileImgLocalPath = req.files?.profileImg[0]?.path;
+
+  if (!profileImgLocalPath) {
+    throw new ApiError(400, "Profile picture is required");
+  }
+
+  const profileImg = await uploadOnCloudinary(profileImgLocalPath);
+  if (!profileImg) {
+    throw new ApiError(400, "profile Image is required");
+  }
+
+  worker.profileImg = profileImg;
+  await worker.save({ validateBeforeSave: false });
+
   res
     .status(200)
     .json(
-      new ApiResponse(
-        200,
-        worker.gallery,
-        "Gallery images send successfully !!",
-      ),
+      new ApiResponse(200, worker, "Profile image updated successfully !!"),
+    );
+});
+
+const getWorkerProfile = asyncHandler(async (req, res) => {
+  const { username } = req.params;
+  const worker = await Worker.find({
+    $or: [{ name: username }, { username }],
+  }).select("-password -refreshToken");
+
+});
+
+const changePassword = asyncHandler(async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+
+  if (!oldPassword || !newPassword) {
+    throw new ApiError(400, "Old password and new password are required");
+  }
+
+  const worker = await Worker.findById(req.worker._id);
+
+  if (!worker) {
+    throw new ApiError(404, "Worker not found");
+  }
+
+  const isCorrect = await worker.isPasswordCorrect(oldPassword);
+
+  if (!isCorrect) {
+    throw new ApiError(401, "Invalid old password");
+  }
+
+  worker.password = newPassword;
+  await worker.save();
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, "", "Password changed successfully !!"),
     );
 });
 
@@ -213,6 +290,10 @@ export {
   registerWorker,
   loginWorker,
   logoutWorker,
-  getWorkerProfile,
+  getCurrentWorker,
   uploadGallery,
+  refreshAccessToken,
+  updateWorkerProfileImg,
+  getWorkerProfile,
+  changePassword,
 };

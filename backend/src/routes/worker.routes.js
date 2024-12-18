@@ -3,9 +3,13 @@ import { upload } from "../middlewares/multer.middleware.js";
 import {
   loginWorker,
   registerWorker,
-  getWorkerProfile,
+  getCurrentWorker,
   uploadGallery,
   logoutWorker,
+  refreshAccessToken,
+  updateWorkerProfileImg,
+  getWorkerProfile,
+  changePassword,
 } from "../controllers/worker.controller.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
 
@@ -23,8 +27,9 @@ router.route("/register").post(
 
 router.route("/login").post(loginWorker);
 // secured routes
-router.route("/me").get(verifyJWT, getWorkerProfile);
+router.route("/current-worker").get(verifyJWT, getCurrentWorker);
 router.route("/logout").get(verifyJWT, logoutWorker);
+router.route("/change-password").post(verifyJWT, changePassword);
 router.route("/gallery").put(
   verifyJWT,
   upload.fields([
@@ -35,5 +40,13 @@ router.route("/gallery").put(
   ]),
   uploadGallery,
 );
+router.route("/access-token").get(refreshAccessToken);
+router
+  .route("/profileImg")
+  .patch(verifyJWT, upload.single("avatar"), updateWorkerProfileImg);
+
+
+router.route("/profile/:username").get(verifyJWT, getWorkerProfile);
+
 
 export default router;

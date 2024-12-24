@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { upload } from "../middlewares/multer.middleware.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
+
 import {
   loginWorker,
   registerWorker,
@@ -10,8 +12,8 @@ import {
   updateWorkerProfileImg,
   getWorkerProfile,
   changePassword,
+  updateWorker
 } from "../controllers/worker.controller.js";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
@@ -30,6 +32,7 @@ router.route("/login").post(loginWorker);
 router.route("/current-worker").get(verifyJWT, getCurrentWorker);
 router.route("/logout").get(verifyJWT, logoutWorker);
 router.route("/change-password").post(verifyJWT, changePassword);
+router.route("/update/:id").patch(verifyJWT,updateWorker),
 router.route("/gallery").put(
   verifyJWT,
   upload.fields([

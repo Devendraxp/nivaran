@@ -120,13 +120,13 @@ const workerSchema = new Schema(
 // Check, is password changed ? and Hash the password before saving
 workerSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
-    next();
+    return next();
   }
   try {
-    this.password = await bcrypt.hash(this.password, 8);
-    next();
+    this.password = await bcrypt.hash(this.password, 10);
+    return next();
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 // Check, Is provided password correct or not

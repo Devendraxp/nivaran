@@ -103,6 +103,7 @@ const registerWorker = asyncHandler(async (req, res) => {
 //login route
 const loginWorker = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
+  console.log("username and password : ", username, password);
 
   if (!username || !password) {
     throw new ApiError(400, "Username or email and password are required");
@@ -116,7 +117,8 @@ const loginWorker = asyncHandler(async (req, res) => {
     throw new ApiError(404, "User not found");
   }
 
-  const isLogin = worker.isPasswordCorrect(password);
+  const isLogin = await worker.isPasswordCorrect(password);
+  console.log("isLogin : ", isLogin);
   if (!isLogin) {
     throw new ApiError(401, "Invalid credentials");
   }

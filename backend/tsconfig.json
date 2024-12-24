@@ -24,10 +24,10 @@
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false,
 
-    // Paths
-    "baseUrl": "./",
-    "outDir": "./dist",
-    "rootDir": "./src",
+    // // Paths
+    // "baseUrl": "./",
+    // "outDir": "./dist",
+    // "rootDir": "./src",
 
   }
 }

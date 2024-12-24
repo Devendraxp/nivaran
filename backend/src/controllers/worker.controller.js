@@ -287,6 +287,21 @@ const changePassword = asyncHandler(async (req, res) => {
     );
 });
 
+
+const updateWorker=asyncHandler(async(req,res)=>{
+  const {id}=req.params;
+  const updatedData=req.body;
+  const updatedProfile=await Worker.findByIdAndUpdate(id,updatedData,{new:true,runValidators:true});
+
+  if(!updatedProfile){
+    throw new ApiError(404, "customer not found");
+  }
+  res.status(200)
+  .json(new ApiResponse(200, updatedProfile, "customer profile updated successfully")); 
+})
+
+
+
 //exporting the functions
 export {
   registerWorker,
@@ -298,4 +313,5 @@ export {
   updateWorkerProfileImg,
   getWorkerProfile,
   changePassword,
+  updateWorker,
 };

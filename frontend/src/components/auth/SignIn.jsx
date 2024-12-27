@@ -19,21 +19,20 @@ export default function SignIn() {
     setError(""); // Clear previous errors
     const data = { username, password };
     axios.post('/api/v1/worker/login', data)
-      .then(function (response) {
-        if (response.data.status === 200 || response.data.status === 201) {
-          navigate('/profile'); // Redirect to /profile on successful submission
-        } else {
-          setError(response.data.message);
-        }
+      .then((response) => {
+      if (response.status === 200 || response.status === 201) {
+        navigate('/profile'); // Redirect to /profile on successful submission
+      } else {
+        setError(response.data.message || "An error occurred. Please try again.");
+      }
       })
-      .catch(function (error) {
-        console.log(error);
-        setError(error.data.message);
+      .catch((error) => {
+      const message = error.response?.data || "An error occurred. Please try again.";
+      setError(message);
       })
       .finally(() => {
-        setIsSubmitting(false);
-        setUsername("");
-        setPassword("");
+      setIsSubmitting(false);
+      setPassword("");
       });
   };
 

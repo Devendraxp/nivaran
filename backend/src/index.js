@@ -11,6 +11,12 @@ app.get('/', (req, res) => {
     res.send('Hello World!');
 });
 
+app.use((err, req, res, next)=>{
+  let {status, message} = err;
+
+res.status(status).json(message);
+})
+
 
 connectDB()
   .then(() => {

@@ -6,6 +6,7 @@ import { RouterProvider,createBrowserRouter } from 'react-router-dom'
 import Home from './components/Pages/Home.jsx'
 import SignIn from './components/Pages/SignIn.jsx'
 import ProfileWorker from './components/Pages/ProfileWorker.jsx'
+import UpdateForm from './components/Pages/UpdateForm.jsx'
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
       {
         path:"profile",
         element : <ProfileWorker />
+      },
+      {
+        path:"update",
+        element:<UpdateForm/>
       }
     ]
   }

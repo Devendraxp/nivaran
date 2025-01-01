@@ -38,10 +38,16 @@ const ProfileSection = () => {
           <p className="text-gray-600"><strong>Phone:</strong> {worker.phoneNo}</p>
           <p className="text-gray-600"><strong>Address:</strong> 123 Main St, Anytown, USA</p>
           <p className="text-gray-600"><strong>Working Hours:</strong>PM</p>
-          <p className="text-gray-600"><strong>Experience:</strong> {worker.experience} years in software development</p>
+          <p className="text-gray-600"><strong>Experience:</strong>{worker.experience} years in software development</p>
+          <p className="text-gray-600"><strong>Languages:</strong>    {worker.language && worker.language.length > 0
+      ? worker.language.join(', ') 
+      : 'No languages specified'}  </p>
+            <p className="text-gray-600"><strong>Services:</strong>    {worker.services && worker.services.length > 0
+      ? worker.services.join(', ') 
+      : 'No services specified'}  </p>
         </div>
       </div>
-    </div>
+    </div> 
   );
 };
 

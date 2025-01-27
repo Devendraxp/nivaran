@@ -36,7 +36,7 @@ const ProfileSection = () => {
         <div className="mt-4 flex flex-col justify-start items-start">
           <p className="text-gray-600"><strong>Email:</strong>{worker.email}</p>
           <p className="text-gray-600"><strong>Phone:</strong> {worker.phoneNo}</p>
-          <p className="text-gray-600"><strong>Address:</strong> 123 Main St, Anytown, USA</p>
+          <p className="text-gray-600"><strong>Address:</strong> {worker.address || 'Address not available'}</p>
           <p className="text-gray-600"><strong>Working Hours:</strong>PM</p>
           <p className="text-gray-600"><strong>Experience:</strong>{worker.experience} years in software development</p>
           <p className="text-gray-600"><strong>Languages:</strong>    {worker.language && worker.language.length > 0

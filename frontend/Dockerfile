@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm install && npm install -g serve
 
 # Copy app files
 COPY . .
@@ -16,5 +16,6 @@ COPY . .
 # Expose port
 EXPOSE 5173
 
-# Start development server
-CMD ["npm", "run", "dev"]
+RUN npm run build
+
+CMD [ "serve", "-s", "dist", "-l", "5173" ]
